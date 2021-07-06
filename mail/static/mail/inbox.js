@@ -46,6 +46,21 @@ function load_mailbox(mailbox) {
   document.querySelector("#emails-view").innerHTML = `<h3>${
     mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
   }</h3>`;
+
+  // Query API for emails
+  fetch(`emails/${mailbox}`)
+    .then((response) => response.json())
+    .then((emails) => {
+      // Print emails in the log
+      console.log(emails);
+
+      // Create a div for each email
+      // TODO
+
+      /* NOTE: 
+      If the email is unread, it should appear with a white background. 
+      If the email has been read, it should appear with a gray background.*/
+    });
 }
 
 function send_email(recipients, subject, body) {
