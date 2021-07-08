@@ -54,8 +54,29 @@ function load_mailbox(mailbox) {
       // Print emails in the log
       console.log(emails);
 
-      // Create a div for each email
-      // TODO
+      /* Create a div for each email, inside, create 3 divs: 
+         one to show the sender, one to show the subject and one for timestamp.
+         Code e.g. in the project page. */
+      // Put the content of each email in the divs
+      for (let mail in emails) { 
+        console.log(mail);
+        // If mail unread (Style accordingly)
+        if (!mail.read) {
+          // Create the divs for each email
+          const element = document.createElement("div");
+          element.innerHTML = `<div class="emailUnread">
+                                <div class="emailProperty"><strong>${emails[mail].sender}</strong></div>
+                                <div class="emailProperty">${emails[mail].subject}</div>
+                                <divclass="emailProperty">${emails[mail].timestamp}</div>
+                               </div>`;
+          element.addEventListener("click", function () {
+            console.log("This element has been clicked!");
+          });
+          document.querySelector("#emails-view").append(element);
+        } else {
+          // TODO (email read)
+        }
+      }
 
       /* NOTE: 
       If the email is unread, it should appear with a white background. 

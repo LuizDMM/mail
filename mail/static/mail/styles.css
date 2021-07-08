@@ -1,3 +1,14 @@
 textarea {
     min-height: 400px;
 }
+
+.emailUnread {
+    display: flex;
+    border-style: solid;
+    padding: 10px;
+}
+
+.emailProperty {
+    border-left: 20px;
+    width: 33%;
+}
