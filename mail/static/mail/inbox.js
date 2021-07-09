@@ -53,34 +53,80 @@ function load_mailbox(mailbox) {
     .then((emails) => {
       // Print emails in the log
       console.log(emails);
-
-      /* Create a div for each email, inside, create 3 divs: 
-         one to show the sender, one to show the subject and one for timestamp.
-         Code e.g. in the project page. */
-      // Put the content of each email in the divs
-      for (let mail in emails) { 
+      // Melhorar esta parte colocando os "if's" em uma função específica, para reaproveitar
+      for (let mail in emails) {
         console.log(mail);
-        // If mail unread (Style accordingly)
-        if (!mail.read) {
+
+        if (mailbox == "inbox") {
+          // Email unread:
+          if (!mail.read) {
+            // Create the divs for each email
+            const element = document.createElement("div");
+            element.innerHTML = `<div class="emailUnread">
+                                <div class="emailProperty col"><strong>${emails[mail].sender}</strong></div>
+                                <div class="emailProperty col-6">${emails[mail].subject}</div>
+                                <divclass="emailProperty col">${emails[mail].timestamp}</div>
+                               </div>`;
+            element.addEventListener("click", function () {
+              console.log("This element has been clicked!");
+            });
+            document.querySelector("#emails-view").append(element);
+          } // Email read:
+          else {
+            // Create the divs for each email
+            const element = document.createElement("div");
+            element.innerHTML = `<div class="emailRead bg-light">
+                                <div class="emailProperty col"><strong>${emails[mail].sender}</strong></div>
+                                <div class="emailProperty col-6">${emails[mail].subject}</div>
+                                <divclass="emailProperty col">${emails[mail].timestamp}</div>
+                               </div>`;
+            element.addEventListener("click", function () {
+              console.log("This element has been clicked!");
+            });
+            document.querySelector("#emails-view").append(element);
+          }
+        } else if (mailbox == "sent") {
           // Create the divs for each email
           const element = document.createElement("div");
-          element.innerHTML = `<div class="emailUnread">
-                                <div class="emailProperty"><strong>${emails[mail].sender}</strong></div>
-                                <div class="emailProperty">${emails[mail].subject}</div>
-                                <divclass="emailProperty">${emails[mail].timestamp}</div>
-                               </div>`;
+          element.innerHTML = `<div class="emailRead bg-light">
+                              <div class="emailProperty col"><strong>${emails[mail].recipients}</strong></div>
+                              <div class="emailProperty col-6">${emails[mail].subject}</div>
+                              <divclass="emailProperty col">${emails[mail].timestamp}</div>
+                             </div>`;
           element.addEventListener("click", function () {
             console.log("This element has been clicked!");
           });
           document.querySelector("#emails-view").append(element);
         } else {
-          // TODO (email read)
+          // Email unread:
+          if (!mail.read) {
+            // Create the divs for each email
+            const element = document.createElement("div");
+            element.innerHTML = `<div class="emailUnread">
+                                <div class="emailProperty col"><strong>${emails[mail].sender}</strong></div>
+                                <div class="emailProperty col-6">${emails[mail].subject}</div>
+                                <divclass="emailProperty col">${emails[mail].timestamp}</div>
+                               </div>`;
+            element.addEventListener("click", function () {
+              console.log("This element has been clicked!");
+            });
+            document.querySelector("#emails-view").append(element);
+          } // Email read:
+          else {
+            // Create the divs for each email
+            const element = document.createElement("div");
+            element.innerHTML = `<div class="emailRead bg-light">
+                                <div class="emailProperty col"><strong>${emails[mail].sender}</strong></div>
+                                <div class="emailProperty col-6">${emails[mail].subject}</div>
+                                <divclass="emailProperty col">${emails[mail].timestamp}</div>
+                               </div>`;
+            element.addEventListener("click", function () {
+              console.log("This element has been clicked!");
+            });
+            document.querySelector("#emails-view").append(element);
+          }
         }
       }
-
-      /* NOTE: 
-      If the email is unread, it should appear with a white background. 
-      If the email has been read, it should appear with a gray background.*/
     });
 }
 
