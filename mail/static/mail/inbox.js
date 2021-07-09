@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 });
 
+function archive_email(id) {
+  // TODO
+}
+
 function compose_email() {
   // Show compose view and hide other views
   document.querySelector("#emails-view").style.display = "none";
@@ -47,6 +51,7 @@ function createMailDiv(status, mail) {
                         <div class="emailProperty col-6">${mail.subject}</div>
                         <divclass="emailProperty col">${mail.timestamp}</div>
                        </div>`;
+    // Edit this event listener:
     element.addEventListener("click", function () {
       console.log("This element has been clicked!");
     });
@@ -60,6 +65,8 @@ function createMailDiv(status, mail) {
                         <div class="emailProperty col-6">${mail.subject}</div>
                         <divclass="emailProperty col">${mail.timestamp}</div>
                        </div>`;
+
+    //Edit this event listener:
     element.addEventListener("click", function () {
       console.log("This element has been clicked!");
     });
@@ -73,6 +80,8 @@ function createMailDiv(status, mail) {
                         <div class="emailProperty col-6">${mail.subject}</div>
                         <divclass="emailProperty col">${mail.timestamp}</div>
                        </div>`;
+
+    // Edit this event listener:
     element.addEventListener("click", function () {
       console.log("This element has been clicked!");
     });
@@ -110,12 +119,16 @@ function load_mailbox(mailbox) {
       }
     });
 
-    return false;
+  return false;
+}
+
+function reply_email(id) {
+  // TODO
 }
 
 function send_email(recipients, subject, body) {
   console.log(recipients, subject, body);
-  // Using the example from https://cs50.harvard.edu/web/2020/projects/3/mail/
+  // Using an adapted version from the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
   fetch("/emails", {
     method: "POST",
     body: JSON.stringify({
@@ -135,5 +148,17 @@ function send_email(recipients, subject, body) {
       } else {
         load_mailbox("sent");
       }
+    });
+}
+
+function view_email(id) {
+  // Using an adapted version from the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
+  fetch(`/emails/${id}`)
+    .then((response) => response.json())
+    .then((email) => {
+      // Print email
+      console.log(email);
+
+      // ... do something else with email ...
     });
 }
