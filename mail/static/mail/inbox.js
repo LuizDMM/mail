@@ -43,25 +43,29 @@ function compose_email() {
 }
 
 function createMailDiv(status, mail) {
-  // If the email is unead and the mailbox is inbox, white background
+  // If the email is unread and the mailbox is inbox, white background
   if (!mail.read && status == "inbox") {
-    // Create the divs for each email
+    // Create the element
     const element = document.createElement("div");
+    // Insert the email id into the element dataset
     element.dataset.id = mail.id;
+    // Give a class to define the BG Color
     element.className = "emailUnread";
+    // Generate the DIV content
     element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
                         <div class="emailProperty col-6">${mail.subject}</div>
                         <divclass="emailProperty col">${mail.timestamp}</div>`;
 
+    // Add an event listener to go to the respective email view
     element.addEventListener("click", function () {
       view_email(Number.parseInt(this.dataset.id));
     });
+    // Append the DIV in the mailbox
     document.querySelector("#emails-view").append(element);
   }
 
-  // Else, if status is "sent", gray background and recipients:
+  // Else if status is "sent", gray background and recipients:
   else if (status == "sent") {
-    // Create the divs for each email
     const element = document.createElement("div");
     element.dataset.id = mail.id;
     element.className = "emailRead bg-light";
@@ -75,9 +79,8 @@ function createMailDiv(status, mail) {
     document.querySelector("#emails-view").append(element);
   }
 
-  // Else, archived status
+  // Else, if the status is archived or the email is read (in the inbox)
   else {
-    // Create the divs for each email
     const element = document.createElement("div");
     element.dataset.id = mail.id;
     element.className = "emailRead bg-light";
@@ -107,12 +110,10 @@ function load_mailbox(mailbox) {
   fetch(`emails/${mailbox}`)
     .then((response) => response.json())
     .then((emails) => {
-      // Print emails in the log
+      // Log the emails in the mailbox
       console.log(emails);
-      // Melhorar esta parte colocando os "if's" em uma função específica, para reaproveitar
+      // Generate a div to each email in the mailbox
       for (let mail in emails) {
-        console.log(mail);
-
         if (mailbox == "inbox") {
           createMailDiv("inbox", emails[mail]);
         } else if (mailbox == "sent") {
@@ -131,6 +132,7 @@ function reply_email(id) {
 }
 
 function send_email(recipients, subject, body) {
+  // Log the information that has been submitted
   console.log(recipients, subject, body);
   // Using an adapted version from the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
   fetch("/emails", {
@@ -143,7 +145,9 @@ function send_email(recipients, subject, body) {
   })
     .then((response) => response.json())
     .then((result) => {
+      // Log the result
       console.log(result);
+      // If the result is an error, return to the compose view
       if (result["error"]) {
         document.addEventListener("DOMContentLoaded", function () {
           document.querySelector("#email-view").style.display = "none";
@@ -164,14 +168,15 @@ function view_email(id) {
       // Print email in console
       console.log(email);
 
-      // Show the mail view and hide the others views
+      // Show the email view and hide the others views
       document.querySelector("#email-view").style.display = "block";
       document.querySelector("#emails-view").style.display = "none";
       document.querySelector("#compose-view").style.display = "none";
 
       // Generate the email view
-      document.querySelector("#email-view").innerHTML = 
-      `<p class="email-header"><strong>From:</strong> ${email.sender}</p>
+      document.querySelector(
+        "#email-view"
+      ).innerHTML = `<p class="email-header"><strong>From:</strong> ${email.sender}</p>
       <p class="email-header"><strong>To</strong> ${email.recipients}</p>
       <p class="email-header"><strong>Subject:</strong> ${email.subject}</p>
       <p class="email-header"><strong>Timestamp:</strong> ${email.timestamp}</p>
