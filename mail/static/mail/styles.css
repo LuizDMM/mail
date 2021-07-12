@@ -2,6 +2,10 @@ textarea {
     min-height: 400px;
 }
 
+.email-header {
+    margin: 0;
+}
+
 .emailProperty {
     border-left: 20px;
     width: 33%;

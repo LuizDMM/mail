@@ -32,6 +32,7 @@ function archive_email(id) {
 
 function compose_email() {
   // Show compose view and hide other views
+  document.querySelector("#email-view").style.display = "none";
   document.querySelector("#emails-view").style.display = "none";
   document.querySelector("#compose-view").style.display = "block";
 
@@ -46,44 +47,46 @@ function createMailDiv(status, mail) {
   if (!mail.read && status == "inbox") {
     // Create the divs for each email
     const element = document.createElement("div");
-    element.innerHTML = `<div class="emailUnread">
-                        <div class="emailProperty col"><strong>${mail.sender}</strong></div>
+    element.dataset.id = mail.id;
+    element.className = "emailUnread";
+    element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
                         <div class="emailProperty col-6">${mail.subject}</div>
-                        <divclass="emailProperty col">${mail.timestamp}</div>
-                       </div>`;
-    // Edit this event listener:
+                        <divclass="emailProperty col">${mail.timestamp}</div>`;
+
     element.addEventListener("click", function () {
-      console.log("This element has been clicked!");
+      view_email(Number.parseInt(this.dataset.id));
     });
     document.querySelector("#emails-view").append(element);
-  } // Else, if status is "sent", gray background and recipients:
+  }
+
+  // Else, if status is "sent", gray background and recipients:
   else if (status == "sent") {
     // Create the divs for each email
     const element = document.createElement("div");
-    element.innerHTML = `<div class="emailRead bg-light">
-                        <div class="emailProperty col"><strong>${mail.recipients}</strong></div>
+    element.dataset.id = mail.id;
+    element.className = "emailRead bg-light";
+    element.innerHTML = `<div class="emailProperty col"><strong>${mail.recipients}</strong></div>
                         <div class="emailProperty col-6">${mail.subject}</div>
-                        <divclass="emailProperty col">${mail.timestamp}</div>
-                       </div>`;
+                        <divclass="emailProperty col">${mail.timestamp}</div>`;
 
-    //Edit this event listener:
     element.addEventListener("click", function () {
-      console.log("This element has been clicked!");
+      view_email(Number.parseInt(this.dataset.id));
     });
     document.querySelector("#emails-view").append(element);
-  } // Else, archived status
+  }
+
+  // Else, archived status
   else {
     // Create the divs for each email
     const element = document.createElement("div");
-    element.innerHTML = `<div class="emailRead bg-light">
-                        <div class="emailProperty col"><strong>${mail.sender}</strong></div>
+    element.dataset.id = mail.id;
+    element.className = "emailRead bg-light";
+    element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
                         <div class="emailProperty col-6">${mail.subject}</div>
-                        <divclass="emailProperty col">${mail.timestamp}</div>
-                       </div>`;
+                        <divclass="emailProperty col">${mail.timestamp}</div>`;
 
-    // Edit this event listener:
     element.addEventListener("click", function () {
-      console.log("This element has been clicked!");
+      view_email(Number.parseInt(this.dataset.id));
     });
     document.querySelector("#emails-view").append(element);
   }
@@ -91,6 +94,7 @@ function createMailDiv(status, mail) {
 
 function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
+  document.querySelector("#email-view").style.display = "none";
   document.querySelector("#emails-view").style.display = "block";
   document.querySelector("#compose-view").style.display = "none";
 
@@ -142,6 +146,7 @@ function send_email(recipients, subject, body) {
       console.log(result);
       if (result["error"]) {
         document.addEventListener("DOMContentLoaded", function () {
+          document.querySelector("#email-view").style.display = "none";
           document.querySelector("#emails-view").style.display = "none";
           document.querySelector("#compose-view").style.display = "block";
         });
@@ -156,9 +161,22 @@ function view_email(id) {
   fetch(`/emails/${id}`)
     .then((response) => response.json())
     .then((email) => {
-      // Print email
+      // Print email in console
       console.log(email);
 
-      // ... do something else with email ...
+      // Show the mail view and hide the others views
+      document.querySelector("#email-view").style.display = "block";
+      document.querySelector("#emails-view").style.display = "none";
+      document.querySelector("#compose-view").style.display = "none";
+
+      // Generate the email view
+      document.querySelector("#email-view").innerHTML = 
+      `<p class="email-header"><strong>From:</strong> ${email.sender}</p>
+      <p class="email-header"><strong>To</strong> ${email.recipients}</p>
+      <p class="email-header"><strong>Subject:</strong> ${email.subject}</p>
+      <p class="email-header"><strong>Timestamp:</strong> ${email.timestamp}</p>
+      <button class="btn btn-sm btn-outline-primary" id="reply">Reply</button>
+      <hr>
+      <div id="email-body">${email.body}</div>`;
     });
 }
