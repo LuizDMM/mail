@@ -42,7 +42,7 @@ function compose_email() {
   document.querySelector("#compose-body").value = "";
 }
 
-function createMailDiv(status, mail) {
+function create_mail_div(status, mail) {
   // If the email is unread and the mailbox is inbox, white background
   if (!mail.read && status == "inbox") {
     // Create the element
@@ -58,7 +58,7 @@ function createMailDiv(status, mail) {
 
     // Add an event listener to go to the respective email view
     element.addEventListener("click", function () {
-      view_email(Number.parseInt(this.dataset.id));
+      view_email(Number.parseInt(this.dataset.id), "inbox");
     });
     // Append the DIV in the mailbox
     document.querySelector("#emails-view").append(element);
@@ -115,16 +115,32 @@ function load_mailbox(mailbox) {
       // Generate a div to each email in the mailbox
       for (let mail in emails) {
         if (mailbox == "inbox") {
-          createMailDiv("inbox", emails[mail]);
+          create_mail_div("inbox", emails[mail]);
         } else if (mailbox == "sent") {
-          createMailDiv("sent", emails[mail]);
+          create_mail_div("sent", emails[mail]);
         } else {
-          createMailDiv("archived", emails[mail]);
+          create_mail_div("archived", emails[mail]);
         }
       }
     });
 
   return false;
+}
+
+function mark_email_read(id) {
+  fetch(`/emails/${id}`)
+    .then((response) => response.json())
+    .then((email) => {
+      if (!email.read) {
+        fetch(`/emails/${email.id}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            read: true,
+          }),
+        });
+      }
+      console.log(email.read);
+    });
 }
 
 function reply_email(id) {
@@ -160,13 +176,18 @@ function send_email(recipients, subject, body) {
     });
 }
 
-function view_email(id) {
+function view_email(id, mailbox) {
   // Using an adapted version from the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
   fetch(`/emails/${id}`)
     .then((response) => response.json())
     .then((email) => {
       // Print email in console
       console.log(email);
+
+      // Mark the email as read if it isn't
+      if (mailbox == "inbox") {
+        mark_email_read(Number.parseInt(email.id));
+      }
 
       // Show the email view and hide the others views
       document.querySelector("#email-view").style.display = "block";
