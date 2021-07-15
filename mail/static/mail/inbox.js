@@ -27,7 +27,17 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function archive_email(id) {
-  // TODO
+  // Fetch a PUT request to change "archived" to "true"
+  // Using the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
+  fetch(`/emails/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      archived: true,
+    }),
+  });
+
+  // Load the inbox
+  load_mailbox("inbox");
 }
 
 function compose_email() {
@@ -55,11 +65,21 @@ function create_mail_div(status, mail) {
     element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
                         <div class="emailProperty col-6">${mail.subject}</div>
                         <divclass="emailProperty col">${mail.timestamp}</div>`;
-
     // Add an event listener to go to the respective email view
     element.addEventListener("click", function () {
       view_email(Number.parseInt(this.dataset.id), "inbox");
     });
+
+    // Create the archive button
+    const archive_button = document.createElement("button");
+    archive_button.innerHTML = "Archive"
+    // Add an event listener to actually archive the email
+    archive_button.addEventListener("click", function () {
+      archive_email(mail.id)
+    })
+
+    // Append the button in the DIV
+    element.appendChild(archive_button);
     // Append the DIV in the mailbox
     document.querySelector("#emails-view").append(element);
   }
@@ -91,12 +111,23 @@ function create_mail_div(status, mail) {
     element.addEventListener("click", function () {
       view_email(Number.parseInt(this.dataset.id));
     });
+    const archive_button = document.createElement("button");
+    if (status == "archive") {
+      archive_button.innerHTML = "Unarchive"
+    }
+    else {
+      archive_button.innerHTML = "Archive"
+    }
+    archive_button.addEventListener("click", function () {
+      archive_email(mail.id)
+    })
+    element.appendChild(archive_button);
     document.querySelector("#emails-view").append(element);
   }
 }
 
 function load_mailbox(mailbox) {
-  // Show the mailbox and hide other views
+  // Show the mailbox view and hide other views
   document.querySelector("#email-view").style.display = "none";
   document.querySelector("#emails-view").style.display = "block";
   document.querySelector("#compose-view").style.display = "none";
