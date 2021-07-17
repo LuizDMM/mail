@@ -27,17 +27,33 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function archive_email(id) {
-  // Fetch a PUT request to change "archived" to "true"
-  // Using the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
-  fetch(`/emails/${id}`, {
-    method: "PUT",
-    body: JSON.stringify({
-      archived: true,
-    }),
-  });
+  fetch(`/emails/${id}`)
+    .then((response) => response.json())
+    .then((email) => {
+      if (email.archived) {
+        // Fetch a PUT request to change "archived" to "false"
+        // Using the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
+        fetch(`/emails/${id}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            archived: false,
+          }),
+        });
+      } else {
+        // Fetch a PUT request to change "archived" to "false"
+        // Using the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
+        fetch(`/emails/${id}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            archived: true,
+          }),
+        });
+      }
+    });
 
   // Load the inbox
   load_mailbox("inbox");
+  return false;
 }
 
 function compose_email() {
@@ -72,11 +88,12 @@ function create_mail_div(status, mail) {
 
     // Create the archive button
     const archive_button = document.createElement("button");
-    archive_button.innerHTML = "Archive"
+    archive_button.innerHTML = "Archive";
     // Add an event listener to actually archive the email
     archive_button.addEventListener("click", function () {
-      archive_email(mail.id)
-    })
+      archive_email(mail.id);
+      return false;
+    });
 
     // Append the button in the DIV
     element.appendChild(archive_button);
@@ -111,16 +128,16 @@ function create_mail_div(status, mail) {
     element.addEventListener("click", function () {
       view_email(Number.parseInt(this.dataset.id));
     });
+
     const archive_button = document.createElement("button");
     if (status == "archive") {
-      archive_button.innerHTML = "Unarchive"
-    }
-    else {
-      archive_button.innerHTML = "Archive"
+      archive_button.innerHTML = "Unarchive";
+    } else {
+      archive_button.innerHTML = "Archive";
     }
     archive_button.addEventListener("click", function () {
-      archive_email(mail.id)
-    })
+      archive_email(mail.id);
+    });
     element.appendChild(archive_button);
     document.querySelector("#emails-view").append(element);
   }
