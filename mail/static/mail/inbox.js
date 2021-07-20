@@ -192,7 +192,23 @@ function mark_email_read(id) {
 }
 
 function reply_email(id) {
-  // TODO
+  // Go to composition form
+  compose_email();
+
+  // Get original mail data
+  fetch(`/emails/${id}`)
+    .then((response) => response.json())
+    .then((email) => {
+      document.querySelector("#compose-recipients").value = email.sender;
+      if (!email.subject.startswith("Re:")) {
+        document.querySelector("#compose-subject").value = `Re: ${email.subject}`;
+      } else {
+        document.querySelector("#compose-subject").value = email.subject};
+      document.querySelector("#compose-body").value = `On ${email.timestamp} ${email.sender} wrote:
+      ${email.body}`;
+    })
+
+  return false;
 }
 
 function send_email(recipients, subject, body) {
@@ -253,4 +269,8 @@ function view_email(id, mailbox) {
       <hr>
       <div id="email-body">${email.body}</div>`;
     });
+
+    document.querySelector("#reply").addEventListener("click", () => {
+      reply_email(id);
+    })
 }
