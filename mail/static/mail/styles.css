@@ -10,11 +10,6 @@ textarea {
     margin: 0;
 }
 
-.emailProperty {
-    border-left: 20px;
-    width: 33%;
-}
-
 .emailRead {
     display: flex;
     border-style: solid;

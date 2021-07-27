@@ -38,21 +38,25 @@ function archive_email(id) {
           body: JSON.stringify({
             archived: false,
           }),
-        });
+        })
+        .then((response) => response.json())
+        .then(load_mailbox("inbox"));
+        return true;
       } else {
-        // Fetch a PUT request to change "archived" to "false"
+        // Fetch a PUT request to change "archived" to "true"
         // Using the example in https://cs50.harvard.edu/web/2020/projects/3/mail/
         fetch(`/emails/${id}`, {
           method: "PUT",
           body: JSON.stringify({
             archived: true,
           }),
-        });
+        })
+        .then((response) => response.json())
+        .then(load_mailbox("inbox"));
+        load_mailbox("inbox")
+        return true;
       }
     });
-
-  // Load the inbox
-  load_mailbox("inbox");
 }
 
 function compose_email() {
@@ -70,18 +74,26 @@ function compose_email() {
 function create_mail_div(status, mail) {
   // If the email is unread and the mailbox is inbox, white background
   if (!mail.read && status == "inbox") {
-    // Create the element
-    const element = document.createElement("div");
+    // Create the div
+    const mail_div = document.createElement("div");
+
     // Insert the email id into the element dataset
-    element.dataset.id = mail.id;
+    mail_div.dataset.id = mail.id;
+
     // Give a class to define the BG Color
-    element.className = "emailUnread";
+    mail_div.className = "emailUnread";
+
+    // Create the child element
+    const mail_child = document.createElement("a");
+    mail_child.className = "d-flex flex-fill";
+
     // Generate the DIV content
-    element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
-                        <div class="emailProperty col-6">${mail.subject}</div>
-                        <divclass="emailProperty col">${mail.timestamp}</div>`;
+    mail_child.innerHTML = `<div class="flex-fill"><strong>${mail.sender}</strong></div>
+    <div class="flex-fill">${mail.subject}</div>
+    <div class="flex-fill">${mail.timestamp}</div>`;
+
     // Add an event listener to go to the respective email view
-    element.addEventListener("click", function () {
+    mail_child.addEventListener("click", function () {
       view_email(Number.parseInt(this.dataset.id), "inbox");
     });
 
@@ -96,11 +108,14 @@ function create_mail_div(status, mail) {
       archive_email(mail.id);
     });
 
-    // Append the button in the DIV
-    element.appendChild(archive_button);
-    
+    // Append the child element to the email div
+    mail_div.appendChild(mail_child);
+
+    // Append the button to the email div
+    mail_div.appendChild(archive_button);
+
     // Append the DIV in the mailbox
-    document.querySelector("#emails-view").append(element);
+    document.querySelector("#emails-view").append(mail_div);
   }
 
   // Else if status is "sent", gray background and recipients:
@@ -120,29 +135,48 @@ function create_mail_div(status, mail) {
 
   // Else, if the status is archived or the email is read (in the inbox)
   else {
-    const element = document.createElement("a");
-    element.dataset.id = mail.id;
-    element.className = "emailRead bg-light";
-    element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
-                        <div class="emailProperty col-6">${mail.subject}</div>
-                        <divclass="emailProperty col">${mail.timestamp}</div>`;
+    // Create the div
+    const mail_div = document.createElement("div");
 
-    element.addEventListener("click", function () {
-      view_email(Number.parseInt(this.dataset.id));
+    // Insert the email id into the element dataset
+    mail_div.dataset.id = mail.id;
+
+    // Give a class to define the BG Color
+    mail_div.className = "emailUnread bg-light";
+
+    // Create the child element
+    const mail_child = document.createElement("a");
+    mail_child.className = "d-flex flex-fill";
+
+    // Generate the DIV content
+    mail_child.innerHTML = `<div class="flex-fill"><strong>${mail.sender}</strong></div>
+    <div class="flex-fill">${mail.subject}</div>
+    <div class="flex-fill">${mail.timestamp}</div>`;
+
+    // Add an event listener to go to the respective email view
+    mail_child.addEventListener("click", function () {
+      view_email(Number.parseInt(this.dataset.id), "inbox");
     });
 
-    const archive_button = document.createElement("a");
-    archive_button.className = "btn btn-sm btn-outline-primary archive"
+    // Create the archive button
+    const archive_button = document.createElement("button");
     archive_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
-      <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-    </svg>`;
+    <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+  </svg>`;
+
+    // Add an event listener to actually archive the email
     archive_button.addEventListener("click", function () {
       archive_email(mail.id);
     });
 
-    element.append(archive_button);
+    // Append the child element to the email div
+    mail_div.appendChild(mail_child);
 
-    document.querySelector("#emails-view").append(element);
+    // Append the button to the email div
+    mail_div.appendChild(archive_button);
+
+    // Append the DIV in the mailbox
+    document.querySelector("#emails-view").append(mail_div);
   }
 }
 
