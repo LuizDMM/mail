@@ -53,7 +53,6 @@ function archive_email(id) {
 
   // Load the inbox
   load_mailbox("inbox");
-  return false;
 }
 
 function compose_email() {
@@ -88,15 +87,18 @@ function create_mail_div(status, mail) {
 
     // Create the archive button
     const archive_button = document.createElement("button");
-    archive_button.innerHTML = "Archive";
+    archive_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
+    <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+  </svg>`;
+
     // Add an event listener to actually archive the email
     archive_button.addEventListener("click", function () {
       archive_email(mail.id);
-      return false;
     });
 
     // Append the button in the DIV
     element.appendChild(archive_button);
+    
     // Append the DIV in the mailbox
     document.querySelector("#emails-view").append(element);
   }
@@ -118,7 +120,7 @@ function create_mail_div(status, mail) {
 
   // Else, if the status is archived or the email is read (in the inbox)
   else {
-    const element = document.createElement("div");
+    const element = document.createElement("a");
     element.dataset.id = mail.id;
     element.className = "emailRead bg-light";
     element.innerHTML = `<div class="emailProperty col"><strong>${mail.sender}</strong></div>
@@ -129,16 +131,17 @@ function create_mail_div(status, mail) {
       view_email(Number.parseInt(this.dataset.id));
     });
 
-    const archive_button = document.createElement("button");
-    if (status == "archive") {
-      archive_button.innerHTML = "Unarchive";
-    } else {
-      archive_button.innerHTML = "Archive";
-    }
+    const archive_button = document.createElement("a");
+    archive_button.className = "btn btn-sm btn-outline-primary archive"
+    archive_button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
+      <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+    </svg>`;
     archive_button.addEventListener("click", function () {
       archive_email(mail.id);
     });
-    element.appendChild(archive_button);
+
+    element.append(archive_button);
+
     document.querySelector("#emails-view").append(element);
   }
 }
@@ -171,8 +174,6 @@ function load_mailbox(mailbox) {
         }
       }
     });
-
-  return false;
 }
 
 function mark_email_read(id) {
@@ -201,12 +202,17 @@ function reply_email(id) {
     .then((email) => {
       document.querySelector("#compose-recipients").value = email.sender;
       if (!email.subject.startswith("Re:")) {
-        document.querySelector("#compose-subject").value = `Re: ${email.subject}`;
+        document.querySelector(
+          "#compose-subject"
+        ).value = `Re: ${email.subject}`;
       } else {
-        document.querySelector("#compose-subject").value = email.subject};
-      document.querySelector("#compose-body").value = `On ${email.timestamp} ${email.sender} wrote:
+        document.querySelector("#compose-subject").value = email.subject;
+      }
+      document.querySelector(
+        "#compose-body"
+      ).value = `On ${email.timestamp} ${email.sender} wrote:
       ${email.body}`;
-    })
+    });
 
   return false;
 }
@@ -270,7 +276,7 @@ function view_email(id, mailbox) {
       <div id="email-body">${email.body}</div>`;
     });
 
-    document.querySelector("#reply").addEventListener("click", () => {
-      reply_email(id);
-    })
+  document.querySelector("#reply").addEventListener("click", () => {
+    reply_email(id);
+  });
 }

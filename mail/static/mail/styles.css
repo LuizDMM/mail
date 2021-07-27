@@ -2,6 +2,10 @@ textarea {
     min-height: 400px;
 }
 
+.archive {
+    margin-left: 20px;
+}
+
 .email-header {
     margin: 0;
 }
