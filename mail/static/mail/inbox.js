@@ -39,8 +39,8 @@ function archive_email(id) {
             archived: false,
           }),
         })
-        .then((response) => response.json())
-        .then(load_mailbox("inbox"));
+          .then((response) => response.json())
+          .then(load_mailbox("inbox"));
         return true;
       } else {
         // Fetch a PUT request to change "archived" to "true"
@@ -51,9 +51,9 @@ function archive_email(id) {
             archived: true,
           }),
         })
-        .then((response) => response.json())
-        .then(load_mailbox("inbox"));
-        load_mailbox("inbox")
+          .then((response) => response.json())
+          .then(load_mailbox("inbox"));
+        load_mailbox("inbox");
         return true;
       }
     });
@@ -77,15 +77,15 @@ function create_mail_div(status, mail) {
     // Create the div
     const mail_div = document.createElement("div");
 
-    // Insert the email id into the element dataset
-    mail_div.dataset.id = mail.id;
-
     // Give a class to define the BG Color
     mail_div.className = "emailUnread";
 
     // Create the child element
     const mail_child = document.createElement("a");
     mail_child.className = "d-flex flex-fill";
+
+    // Insert the email id into the element dataset
+    mail_child.dataset.id = mail.id;
 
     // Generate the DIV content
     mail_child.innerHTML = `<div class="flex-fill"><strong>${mail.sender}</strong></div>
@@ -138,15 +138,15 @@ function create_mail_div(status, mail) {
     // Create the div
     const mail_div = document.createElement("div");
 
-    // Insert the email id into the element dataset
-    mail_div.dataset.id = mail.id;
-
     // Give a class to define the BG Color
     mail_div.className = "emailUnread bg-light";
 
     // Create the child element
     const mail_child = document.createElement("a");
     mail_child.className = "d-flex flex-fill";
+
+    // Insert the email id into the element dataset
+    mail_child.dataset.id = mail.id;
 
     // Generate the DIV content
     mail_child.innerHTML = `<div class="flex-fill"><strong>${mail.sender}</strong></div>
@@ -235,7 +235,7 @@ function reply_email(id) {
     .then((response) => response.json())
     .then((email) => {
       document.querySelector("#compose-recipients").value = email.sender;
-      if (!email.subject.startswith("Re:")) {
+      if (!email.subject.startsWith("Re:")) {
         document.querySelector(
           "#compose-subject"
         ).value = `Re: ${email.subject}`;
@@ -288,29 +288,39 @@ function view_email(id, mailbox) {
       // Print email in console
       console.log(email);
 
-      // Mark the email as read if it isn't
       if (mailbox == "inbox") {
+        // Mark the email as read if it isn't
         mark_email_read(Number.parseInt(email.id));
+
+        // Generate the email view
+        document.querySelector(
+          "#email-view"
+        ).innerHTML = `<p class="email-header"><strong>From:</strong> ${email.sender}</p>
+        <p class="email-header"><strong>To</strong> ${email.recipients}</p>
+        <p class="email-header"><strong>Subject:</strong> ${email.subject}</p>
+        <p class="email-header"><strong>Timestamp:</strong> ${email.timestamp}</p>
+        <button class="btn btn-sm btn-outline-primary" id="reply">Reply</button>
+        <hr>
+        <div id="email-body">${email.body}</div>`;
+
+        document.querySelector("#reply").addEventListener("click", () => {
+          reply_email(id);
+        });
+      } else {
+        // Generate the email view
+        document.querySelector(
+          "#email-view"
+        ).innerHTML = `<p class="email-header"><strong>From:</strong> ${email.sender}</p>
+        <p class="email-header"><strong>To</strong> ${email.recipients}</p>
+        <p class="email-header"><strong>Subject:</strong> ${email.subject}</p>
+        <p class="email-header"><strong>Timestamp:</strong> ${email.timestamp}</p>
+        <hr>
+        <div id="email-body">${email.body}</div>`;
       }
 
       // Show the email view and hide the others views
       document.querySelector("#email-view").style.display = "block";
       document.querySelector("#emails-view").style.display = "none";
       document.querySelector("#compose-view").style.display = "none";
-
-      // Generate the email view
-      document.querySelector(
-        "#email-view"
-      ).innerHTML = `<p class="email-header"><strong>From:</strong> ${email.sender}</p>
-      <p class="email-header"><strong>To</strong> ${email.recipients}</p>
-      <p class="email-header"><strong>Subject:</strong> ${email.subject}</p>
-      <p class="email-header"><strong>Timestamp:</strong> ${email.timestamp}</p>
-      <button class="btn btn-sm btn-outline-primary" id="reply">Reply</button>
-      <hr>
-      <div id="email-body">${email.body}</div>`;
     });
-
-  document.querySelector("#reply").addEventListener("click", () => {
-    reply_email(id);
-  });
 }
